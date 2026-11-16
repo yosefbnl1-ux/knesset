@@ -377,7 +377,7 @@ const win=W.win,nol=W.noLast,gate=W.gate||{'24':1,'29':1},st={};
 const gp=(x,s)=>((W.gap||{})[x]||[]).some(([a,b])=>s>=a&&s<b),pr=(x,s)=>s>=win[x][0]&&s<win[x][1]&&!gp(x,s),wl=x=>{let c=0;for(let s=win[x][0];s<Math.min(S,win[x][1]);s++)if(!gp(x,s))c++;return Math.max(1,c)};
 const isLast=(x,s)=>fin.has(x)&&!nol.has(x)&&win[x][1]===s+1;
 g.forEach(x=>st[x]={br:(fin.has(x)&&!nol.has(x))?1:0,si:0,sd:0,pk:{},ate:-1,lb:-9,lp:null,run:0,wk:0});
-const rows=fx.map(r=>({asg:{...r.asg},br:[...r.br]}));let miss=0,DB=0,RT=0;const started=new Set();
+const rows=fx.map(r=>({asg:{...r.asg},br:[...r.br],...(r.m?{m:[...r.m]}:{})}));let miss=0,DB=0,RT=0;const started=new Set();
 fx.forEach((r,s)=>{for(const[id,x]of Object.entries(r.asg)){if(!st[x])continue;started.add(x);const p=POS.find(q=>q.id===id);st[x].pk[p.k]=(st[x].pk[p.k]||0)+1;st[x][p.t]++;st[x].lp=p.k;st[x].lt=p.t;st[x].run=p.t==='sd'?st[x].run+1:0;st[x].wk++}
 r.br.forEach(x=>{if(!st[x])return;st[x].wk=0;started.add(x);if(!isLast(x,s))st[x].br++;st[x].lb=s;st[x].lp=null;st[x].lt=null;st[x].run=0;if(isL[s]&&st[x].ate<0)st[x].ate=s})});
 let forceBr=fx.length?(fx[fx.length-1].asg['סנח']||null):null;
@@ -467,7 +467,7 @@ function mkW(g,S,a,L){const sw=$('sw').value?hm($('sw').value):1e9;const swI=Mat
 const win={},nol=new Set(),aft=curMode==='a';
 g.forEach(x=>{win[x]=[0,S];if(aft){if(LNG.has(x))win[x]=[0,swI];else if(JOIN.has(x))win[x]=[swI,S]}else if(LNG.has(x))nol.add(x)});
 return{win,noLast:nol,gate:{...GATES},first:new Set(aft?g.filter(x=>LNG.has(x)):[])}}
-function build(fx,gOv,Wov){
+function build(fx,gOv,Wov){pendFix=null;
 const g=gOv||names();const out=$('out');
 if(g.length<1){out.innerHTML='<p class="warn">הכנס שמות מאבטחים כדי להתחיל</p>';return}
 if(!$('st').value||!$('en').value){out.innerHTML='<p class="warn">בחר שעת התחלה ושעת סיום (ב"הגדרות מתקדמות")</p>';return}
@@ -503,8 +503,8 @@ function swapG(i,x,y){const r=last.best.rows[i],px=Object.keys(r.asg).find(k=>r.
 if(x===y||(!px&&!py))return;
 if(px)r.asg[px]=y;else r.br=r.br.map(z=>z===x?y:z);
 if(py)r.asg[py]=x;else r.br=r.br.map(z=>z===y?x:z);
-r.m=[...(r.m||[]),...[px,py].filter(Boolean)];recalc()}
-let edit=null;
+r.m=[...(r.m||[]),...[px,py].filter(Boolean)];recalc();pendFix=i}
+let edit=null,pendFix=null;
 function saveLast(){try{const{g,S,a,e,L,isL,rm,best,W}=last;let o=null;try{o=JSON.parse(localStorage.getItem('shiftLast')||'null')}catch(x){}if(!o||o.k!==today())o={k:today()};
 o[curMode]={g,S,a,e,L,isL,rm,rows:best.rows,miss:best.miss,uneaten:best.uneaten,score:best.score,W:{win:W.win,gap:W.gap||{},noLast:[...W.noLast],gate:W.gate,first:[...(W.first||[])],dal:W.dal||[]},EX:EXTRA,SP:SPLIT};localStorage.setItem('shiftLast',JSON.stringify(o))}catch(x){}}
 function restoreLast(){try{const o=JSON.parse(localStorage.getItem('shiftLast')||'null');if(!o||o.k!==today())return;const m0=new Date().getHours()>=13?'a':'m',m=o[m0]?m0:(o[m0==='a'?'m':'a']?(m0==='a'?'m':'a'):null);if(!m)return;const d=o[m];pre(m,true);d.EX.forEach(x=>{EXTRA.push(x);regExtra(x)});SPLIT=d.SP||[];last={mode:m,g:d.g,S:d.S,a:d.a,e:d.e,L:d.L,isL:d.isL,rm:d.rm,best:{rows:d.rows,miss:d.miss,uneaten:d.uneaten,score:d.score},W:{win:d.W.win,gap:d.W.gap,noLast:new Set(d.W.noLast),gate:d.W.gate,first:new Set(d.W.first),dal:d.W.dal}};recalc();render();show('result')}catch(x){last=null}}
@@ -536,7 +536,7 @@ const pk=pick===i?'<div class="pkr"><span>להוריד מכאן:</span><button d
 let ep='';if(edit&&edit.i===i){const xOnBreak=r.br.includes(edit.x);const ot=[...Object.entries(r.asg).map(([id,y])=>[y,PM[id].lab]),...(xOnBreak?[]:r.br.map(y=>[y,'☕']))].filter(([y])=>y!==edit.x);
 ep=`<div class="pkr"><span>להחליף את ${esc(edit.x)} עם:</span>${ot.map(([y,l])=>`<button class="sw" data-y="${esc(y)}">${esc(y)} (${l})</button>`).join('')}<button class="cx">ביטול</button></div>`}
 if(!openSet){const base=curI>=0?curI:Math.min(ni,S-1);openSet=window.innerWidth>=1100?new Set([...Array(S).keys()]):new Set([base,base+1].filter(k=>k<S))}
-return `<article class="slot${isL[i]?' l':''}${i===curI?' now':''}${(openSet.has(i)||pick===i||(edit&&edit.i===i))?'':' col'}" data-s="${i}"><header><b>${fm(a+i*L)}</b>${i===curI?'<em class="nowb">עכשיו</em>':''}${dur(i)!==L?`<em>${dur(i)} דק׳</em>`:''}${isL[i]?'<em>🍽 ארוחה</em>':''}<button class="cutb" data-i="${i}">הורדת עמדות</button><a class="wa sm" data-img="${i}" role="button" tabindex="0">📷 שלח</a></header>${pk}${ep}<table class="pt">${trs}<tr class="bkr"><th>☕ הפסקה</th><td>${r.br.length?r.br.map(x=>`<span class="ed" data-i="${i}" data-x="${esc(x)}">${nm(x)}</span>`).join(' · '):'—'}</td></tr></table></article>`}).join('')}
+return `<article class="slot${isL[i]?' l':''}${i===curI?' now':''}${(openSet.has(i)||pick===i||(edit&&edit.i===i))?'':' col'}" data-s="${i}"><header><b>${fm(a+i*L)}</b>${i===curI?'<em class="nowb">עכשיו</em>':''}${dur(i)!==L?`<em>${dur(i)} דק׳</em>`:''}${isL[i]?'<em>🍽 ארוחה</em>':''}<button class="cutb" data-i="${i}">הורדת עמדות</button><a class="wa sm" data-img="${i}" role="button" tabindex="0">📷 שלח</a></header>${pk}${ep}${(pendFix===i&&i<S-1)?`<div class="pkr fixb"><span>✋ שינית ידנית את האיקס הזה. לעדכן את המשך הסידור (מ־${fm(a+(i+1)*L)}) כדי שיתאים לשינוי?</span><button class="fixgo">🔄 עדכן את ההמשך</button><button class="fixno">השאר כמו שזה</button></div>`:''}<table class="pt">${trs}<tr class="bkr"><th>☕ הפסקה</th><td>${r.br.length?r.br.map(x=>`<span class="ed" data-i="${i}" data-x="${esc(x)}">${nm(x)}</span>`).join(' · '):'—'}</td></tr></table></article>`}).join('')}
 else if(view==='guard'){
 h+=all.map(x=>`<article class="gc"><header>${nm(x)}${winTxt(x)}</header><div class="ms">`+best.rows.map((r,i)=>{const id=Object.keys(r.asg).find(k=>r.asg[k]===x),t=fm(a+i*L);return id?`<span class="m${PM[id].t==='si'?' si':''}"><small>${t}</small>${PM[id].lab}</span>`:r.br.includes(x)?`<span class="m b${isL[i]?' l':''}"><small>${t}</small>☕</span>`:`<span class="m b" style="opacity:.4"><small>${t}</small>—</span>`}).join('')+'</div></article>').join('')}
 else{
@@ -553,7 +553,7 @@ document.querySelectorAll('.pkr button[data-w]').forEach(b=>b.onclick=()=>{b.dat
 document.querySelectorAll('.ed').forEach(c=>c.onclick=()=>{if(!c.dataset.x)return;edit={i:+c.dataset.i,x:c.dataset.x};render()});
 document.querySelectorAll('.sw').forEach(b=>b.onclick=()=>{swapG(edit.i,edit.x,b.dataset.y);edit=null;render()});
 document.querySelectorAll('.cx').forEach(b=>b.onclick=()=>{edit=null;render()});
-const cw=()=>({win:{...W.win},noLast:new Set(W.noLast),gate:W.gate,gap:{...(W.gap||{})},first:W.first});
+const cw=()=>({win:{...W.win},noLast:new Set(W.noLast),gate:W.gate,gap:{...(W.gap||{})},first:W.first}); document.querySelectorAll('.fixgo').forEach(b=>b.onclick=()=>{const i=pendFix;if(i==null)return;b.textContent='⏳ מעדכן...';setTimeout(()=>build(last.best.rows.slice(0,i+1),last.g,cw()),40)}); document.querySelectorAll('.fixno').forEach(b=>b.onclick=()=>{pendFix=null;render()});
 $('lv').onclick=()=>{const x=$('gs').value,i=+$('fs').value,rv=$('rs').value;if(!g.includes(x))return;const w2=cw();if(rv!==''&&+rv>i)w2.gap[x]=[...(w2.gap[x]||[]),[i,+rv]];else w2.win[x]=[w2.win[x][0],Math.min(w2.win[x][1],i)];build(last.best.rows.slice(0,i),g,w2)};
 $('jn').onclick=()=>{const nr=($('jname').value||'').trim(),nn=nr?nr.replace(/\s*[*!]*$/,'').trim():'';if(nr)addNames(nr);const x=nn||$('gs').value,i=+$('fs').value;const w2=cw(),w0=w2.win[x];if(w0&&g.includes(x)){if(w0[1]>=S)return;if(i>=w0[1]){w2.gap[x]=[...(w2.gap[x]||[]),[w0[1],i]];w2.win[x]=[w0[0],S]}else w2.win[x]=[i,S]}else w2.win[x]=[i,S];build(last.best.rows.slice(0,i),g.includes(x)?g:[...g,x],w2)};
 $('exa').onclick=()=>{const nm0=($('exn').value||'').trim();if(!nm0){$('exn').focus();return}const f=+$('exf').value,tv=$('ext').value,t=tv===''?last.S:+tv;if(t<=f)return;const x={id:'ex'+Date.now()%1e7,lab:nm0,t:$('exk').value,cert:$('exc').checked,dal:$('exd').checked,from:f,to:t};EXTRA.push(x);regExtra(x);build(last.best.rows.slice(0,f),last.g,cw())};
@@ -626,7 +626,7 @@ const t=T0+' · '+d.getDate()+'.'+(d.getMonth()+1)+'.'+d.getFullYear()+' · '+(c
 L.unshift({k,d:d.getDate()+'.'+(d.getMonth()+1),m:curMode==='m'?'בוקר':'צהריים',t});localStorage.setItem('shiftHist',JSON.stringify(L.slice(0,14)))}catch(e){}histUI()}
 function histUI(){const L=histGet();$('hist2').innerHTML=L.length?`<details class="card hh"><summary>🗂️ סידורים קודמים (${L.length})</summary>${L.map((z,i)=>`<details><summary>${esc(z.d)} · ${esc(z.m)}</summary><pre>${esc(z.t)}</pre><a class="wa" target="_blank" rel="noopener" href="${waUrl(z.t)}">שלח בווצאפ</a></details>`).join('')}</details>`:''}
 load();chips();gatesUI();setLogo();histUI();['r4','r5','r6'].forEach(id=>{$(id).oninput=gatesUI});
-const VER='16.11.2026 · גרסה 53';$('ver').textContent='גרסה: '+VER+' · אם זה נראה לך לא מעודכן, פתח את הקישור עצמו (לא עותק שמור) ורענן את הדף';let wipeArm=false;$('wipe').onclick=()=>{if(!wipeArm){wipeArm=true;$('wipe').textContent='בטוח? לחץ שוב למחיקה';setTimeout(()=>{wipeArm=false;$('wipe').textContent='🗑️ מחק את כל הנתונים במכשיר הזה'},4000);return}try{localStorage.removeItem('shiftRoster');localStorage.removeItem('shift');localStorage.removeItem('shiftPal');localStorage.removeItem('shiftHist')}catch(e){}location.reload()};pre(new Date().getHours()>=13?'a':'m',true);restoreLast();setInterval(tick,30000);
+const VER='16.11.2026 · גרסה 54 (דוגמה)';$('ver').textContent='גרסה: '+VER+' · אם זה נראה לך לא מעודכן, פתח את הקישור עצמו (לא עותק שמור) ורענן את הדף';let wipeArm=false;$('wipe').onclick=()=>{if(!wipeArm){wipeArm=true;$('wipe').textContent='בטוח? לחץ שוב למחיקה';setTimeout(()=>{wipeArm=false;$('wipe').textContent='🗑️ מחק את כל הנתונים במכשיר הזה'},4000);return}try{localStorage.removeItem('shiftRoster');localStorage.removeItem('shift');localStorage.removeItem('shiftPal');localStorage.removeItem('shiftHist')}catch(e){}location.reload()};pre(new Date().getHours()>=13?'a':'m',true);restoreLast();setInterval(tick,30000);
 
 
 (function(){const sp=document.getElementById('splash');if(!sp)return;let seen=false;try{seen=!!sessionStorage.getItem('splashSeen')}catch(e){}
