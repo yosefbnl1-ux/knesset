@@ -250,7 +250,7 @@ body{max-width:none;padding:0 0 40px}
 <details class="card adv"><summary>⚙️ הגדרות מתקדמות</summary>
 <div class="advg">
 <div><h3>🚨 הקפצת כונן שילדי</h3><p class="hint" id="kinfo" style="margin:4px 0 8px"></p><div class="row" id="krow"><select id="ksel"></select><button class="btn2" id="kgo" type="button">הקפץ</button></div><div id="kask"></div></div>
-<div><h3>🚧 עבודות תשתית בכנסת</h3><label style="display:flex;gap:10px;align-items:flex-start;color:var(--mut);font-size:.92rem"><input type="checkbox" id="farc" checked style="margin-top:4px"><span>המעבר מסיור ל־23 (ומ־25 ל־23) ארוך עכשיו, אז עדיף להימנע ממנו. מ־23 לסיור או ל־25 אין בעיה.</span></label></div>
+
 <section><h3>שעות המשמרת</h3><div class="row3">
 <div><label>תחילה</label><input type="time" id="st" value="06:50"></div>
 <div><label>סיום</label><input type="time" id="en" value="14:50"></div>
@@ -438,8 +438,8 @@ return{rows,st,score,uneaten,miss}}
 
 const PM={};POS.forEach(q=>PM[q.id]=q);
 let EXTRA=[];const swOk=(a,b)=>!a.startsWith('23')&&!b.startsWith('23');
-let SITSIT=40,SITPOL=30,SWP=45,SWPOL=25,WKMAX=3,WKPOL=70;let FARON=true;try{FARON=localStorage.getItem('shiftFar')!=='0'}catch(e){}
-const farMv=(a,b)=>FARON&&b==='23'&&(a==='סיור'||a==='25');
+let SITSIT=40,SITPOL=30,SWP=45,SWPOL=25,WKMAX=3,WKPOL=70;
+const farMv=(a,b)=>b==='23'&&(a==='סיור'||a==='25');
 function regExtra(x){const q={id:x.id,k:x.lab,t:x.t,lab:x.lab,ex:1};POS.push(q);PM[q.id]=q;DISP.push(q.id);DROP.push(q.id)}
 function clearExtra(){SPLIT=[];EXTRA.forEach(x=>{[POS,DISP,DROP].forEach(A=>{const i=A.findIndex(y=>(y.id||y)===x.id);if(i>=0)A.splice(i,1)});delete PM[x.id]});EXTRA=[]}
 function polish(best,g,f0,S,rm,W){
@@ -572,7 +572,7 @@ function addName(){const v=$('nm').value.trim();if(!v)return;addNames(v);$('nm')
 $('add').onclick=addName;$('nm').oninput=()=>{srch=$('nm').value.trim();chips()};$('nm').onkeydown=ev=>{if(ev.key==='Enter'){ev.preventDefault();addName()}};
 function show(p){if(p==='setup'){remUI();gatesUI()}$('pg1').hidden=p!=='setup';$('pg2').hidden=p!=='result';$('pg3').hidden=p!=='lasts';$('n1').classList.toggle('on',p==='setup');$('n2').classList.toggle('on',p==='result');$('n3').classList.toggle('on',p==='lasts');window.scrollTo(0,0);if(p==='result')setTimeout(()=>{try{clockTick()}catch(x){}},0)}
 $('n1').onclick=()=>show('setup');$('n2').onclick=()=>show('result');$('n3').onclick=()=>show('lasts');
-$('farc').checked=FARON;$('farc').onchange=()=>{FARON=$('farc').checked;try{localStorage.setItem('shiftFar',FARON?'1':'0')}catch(e){}};
+
 $('kgo').onclick=()=>{const n=$('ksel').value;if(!n)return;const toast=t=>{let d=document.getElementById('ktoast');if(!d){d=document.createElement('div');d.id='ktoast';d.style.cssText='position:fixed;top:12px;left:12px;right:12px;z-index:99;background:#14532d;color:#fff;padding:12px 14px;border-radius:12px;font-weight:600;text-align:center;box-shadow:0 4px 16px #0004';document.body.appendChild(d)}d.textContent=t;d.style.display='block';clearTimeout(d._t);d._t=setTimeout(()=>d.style.display='none',6000)};
 const go=()=>{const rb=summon(n);chips();if(rb){show('result');toast(n+' הוקפץ לשילדי. הסידור עודכן מהאיקס הבא')}else{toast(n+' הוקפץ לשילדי. לא היה סידור פעיל, נבנה סידור חדש');$('go').click()}};
 const S0=last&&last.mode===curMode&&curMode==='m'?last.S:0,wl=S0&&(fin.has(n)||last.best.rows[S0-1].br.includes(n));
