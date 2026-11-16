@@ -250,7 +250,7 @@ body{max-width:none;padding:0 0 40px}
 <details class="card adv"><summary>⚙️ הגדרות מתקדמות</summary>
 <div class="advg">
 <div><h3>🚨 הקפצת כונן שילדי</h3><p class="hint" id="kinfo" style="margin:4px 0 8px"></p><div class="row" id="krow"><select id="ksel"></select><button class="btn2" id="kgo" type="button">הקפץ</button></div><div id="kask"></div></div>
-<div><h3>🚧 עבודות תשתית בכנסת</h3><label style="display:flex;gap:10px;align-items:flex-start;color:var(--mut);font-size:.92rem"><input type="checkbox" id="farc" checked style="margin-top:4px"><span>המעבר מסיור ל־23, 27 ו־29 ארוך עכשיו. העדף העברה מסיור ל־24, 25 ו־26 (ולהפך).</span></label></div>
+<div><h3>🚧 עבודות תשתית בכנסת</h3><label style="display:flex;gap:10px;align-items:flex-start;color:var(--mut);font-size:.92rem"><input type="checkbox" id="farc" checked style="margin-top:4px"><span>המעבר מסיור ל־23 (ומ־25 ל־23) ארוך עכשיו, אז עדיף להימנע ממנו. מ־23 לסיור או ל־25 אין בעיה.</span></label></div>
 <section><h3>שעות המשמרת</h3><div class="row3">
 <div><label>תחילה</label><input type="time" id="st" value="06:50"></div>
 <div><label>סיום</label><input type="time" id="en" value="14:50"></div>
@@ -290,7 +290,7 @@ const DISP=['23 א','23 ב','24','25','26','27','29','סיור א','סיור ב'
 const DROP=['סנח','סיור ב','23 ב','סיור א','27','26','25'];
 const cert=new Set(),fin=new Set(),DAL=new Set(),KON=new Set();let SPLIT=[];let last=null,view='post';
 
-let roster=[],srch='',edMode=false,recd=null,nL=3,rstArm=false,curMode='m';const hist={},LNG=new Set(),JOIN=new Set(),NITE=new Set(),GATES={'24':1,'25':1,'29':0};const today=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()};const off=new Set();
+let roster=[],srch='',edMode=false,recd=null,nL=3,rstArm=false,curMode='m';const hist={},LNG=new Set(),JOIN=new Set(),NITE=new Set(),GATES={'24':1,'25':0,'29':1};const today=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()};const off=new Set();
 function names(){return roster.filter(n=>!off.has(n)&&!(curMode==='a'&&KON.has(n)))}
 const he=(a,b)=>a.localeCompare(b,'he');
 const mk=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)};
@@ -340,9 +340,9 @@ else if(k==='t'){if(fin.has(n)){fin.delete(n);NITE.delete(n)}else fin.add(n)}
 else if(k==='d'){DAL.has(n)?DAL.delete(n):DAL.add(n)}
 else{cert.has(n)?cert.delete(n):cert.add(n)}
 chips();save()})}
-function save(){try{localStorage.setItem('shiftRoster',JSON.stringify({r:roster,c:[...cert],dl:[...DAL],f:[...fin],fd:today(),o:[...off],h:hist,rc:recd,lg:[...LNG],jn:[...JOIN],nt:[...NITE],kn:[...KON],gt:GATES,mo:MO}))}catch(e){}}
+function save(){try{localStorage.setItem('shiftRoster',JSON.stringify({r:roster,c:[...cert],dl:[...DAL],f:[...fin],fd:today(),o:[...off],h:hist,rc:recd,lg:[...LNG],jn:[...JOIN],nt:[...NITE],kn:[...KON],gt:GATES,gtv:2,mo:MO}))}catch(e){}}
 function load(){try{const d=JSON.parse(localStorage.getItem('shiftRoster')||'null');
-if(d){roster=d.r||[];(d.c||[]).forEach(x=>cert.add(x));(d.dl||[]).forEach(x=>DAL.add(x));if(d.fd===today()){(d.f||[]).forEach(x=>fin.add(x));(d.lg||[]).forEach(x=>LNG.add(x));(d.jn||[]).forEach(x=>JOIN.add(x));(d.nt||[]).forEach(x=>NITE.add(x));(d.kn||[]).forEach(x=>KON.add(x));[...NITE].forEach(x=>{if(!JOIN.has(x))NITE.delete(x)})}(d.o||[]).forEach(x=>off.add(x));Object.assign(hist,d.h||{});if(d.gt)Object.assign(GATES,d.gt);recd=d.rc||null;MO=d.mo||mk();roster.sort(he);monthCheck()}
+if(d){roster=d.r||[];(d.c||[]).forEach(x=>cert.add(x));(d.dl||[]).forEach(x=>DAL.add(x));if(d.fd===today()){(d.f||[]).forEach(x=>fin.add(x));(d.lg||[]).forEach(x=>LNG.add(x));(d.jn||[]).forEach(x=>JOIN.add(x));(d.nt||[]).forEach(x=>NITE.add(x));(d.kn||[]).forEach(x=>KON.add(x));[...NITE].forEach(x=>{if(!JOIN.has(x))NITE.delete(x)})}(d.o||[]).forEach(x=>off.add(x));Object.assign(hist,d.h||{});if(d.gt&&d.gtv===2)Object.assign(GATES,d.gt);recd=d.rc||null;MO=d.mo||mk();roster.sort(he);monthCheck()}
 else{const o=JSON.parse(localStorage.getItem('shift')||'null');if(o){roster=[...new Set((o.n||'').split('\n').map(z=>z.trim()).filter(Boolean))];(o.c||[]).forEach(x=>cert.add(x))}}}catch(e){}}
 function addNames(t){t.split('\n').map(z=>z.trim()).filter(Boolean).forEach(l=>{const m=l.match(/^(.*?)\s*([*!]*)$/),n=m[1].trim();if(!n)return;if(!roster.includes(n))roster.push(n);if(m[2].includes('*'))cert.add(n);if(m[2].includes('!'))fin.add(n)});roster.sort(he)}
 $('addl').onclick=()=>{addNames($('names').value);$('names').value='';chips();save()};
@@ -437,9 +437,9 @@ const score=6*rng(nv('si'))+2*rng(nv('sd'))+4*rng(nv('br'))+3*Math.abs(avg(cv)-a
 return{rows,st,score,uneaten,miss}}
 
 const PM={};POS.forEach(q=>PM[q.id]=q);
-let EXTRA=[];const swOk=(a,b)=>{const pt=z=>z.startsWith('סיור'),nr=z=>z==='24'||z==='26';return (pt(a)&&nr(b))||(pt(b)&&nr(a))};
-let SITSIT=40,SITPOL=30,SWP=45,SWPOL=25,WKMAX=3,WKPOL=70;const FAR=new Set(['23','27','29']);let FARON=true;try{FARON=localStorage.getItem('shiftFar')!=='0'}catch(e){}
-const farMv=(a,b)=>FARON&&a&&b&&((a==='סיור'&&FAR.has(b))||(b==='סיור'&&FAR.has(a))||(a==='25'&&b==='23'));
+let EXTRA=[];const swOk=(a,b)=>!a.startsWith('23')&&!b.startsWith('23');
+let SITSIT=40,SITPOL=30,SWP=45,SWPOL=25,WKMAX=3,WKPOL=70;let FARON=true;try{FARON=localStorage.getItem('shiftFar')!=='0'}catch(e){}
+const farMv=(a,b)=>FARON&&b==='23'&&(a==='סיור'||a==='25');
 function regExtra(x){const q={id:x.id,k:x.lab,t:x.t,lab:x.lab,ex:1};POS.push(q);PM[q.id]=q;DISP.push(q.id);DROP.push(q.id)}
 function clearExtra(){SPLIT=[];EXTRA.forEach(x=>{[POS,DISP,DROP].forEach(A=>{const i=A.findIndex(y=>(y.id||y)===x.id);if(i>=0)A.splice(i,1)});delete PM[x.id]});EXTRA=[]}
 function polish(best,g,f0,S,rm,W){
@@ -626,7 +626,7 @@ const t=T0+' · '+d.getDate()+'.'+(d.getMonth()+1)+'.'+d.getFullYear()+' · '+(c
 L.unshift({k,d:d.getDate()+'.'+(d.getMonth()+1),m:curMode==='m'?'בוקר':'צהריים',t});localStorage.setItem('shiftHist',JSON.stringify(L.slice(0,14)))}catch(e){}histUI()}
 function histUI(){const L=histGet();$('hist2').innerHTML=L.length?`<details class="card hh"><summary>🗂️ סידורים קודמים (${L.length})</summary>${L.map((z,i)=>`<details><summary>${esc(z.d)} · ${esc(z.m)}</summary><pre>${esc(z.t)}</pre><a class="wa" target="_blank" rel="noopener" href="${waUrl(z.t)}">שלח בווצאפ</a></details>`).join('')}</details>`:''}
 load();chips();gatesUI();setLogo();histUI();['r4','r5','r6'].forEach(id=>{$(id).oninput=gatesUI});
-const VER='20.10.2026 · גרסה 51';$('ver').textContent='גרסה: '+VER+' · אם זה נראה לך לא מעודכן, פתח את הקישור עצמו (לא עותק שמור) ורענן את הדף';let wipeArm=false;$('wipe').onclick=()=>{if(!wipeArm){wipeArm=true;$('wipe').textContent='בטוח? לחץ שוב למחיקה';setTimeout(()=>{wipeArm=false;$('wipe').textContent='🗑️ מחק את כל הנתונים במכשיר הזה'},4000);return}try{localStorage.removeItem('shiftRoster');localStorage.removeItem('shift');localStorage.removeItem('shiftPal');localStorage.removeItem('shiftHist')}catch(e){}location.reload()};pre(new Date().getHours()>=13?'a':'m',true);restoreLast();setInterval(tick,30000);
+const VER='16.11.2026 · גרסה 53';$('ver').textContent='גרסה: '+VER+' · אם זה נראה לך לא מעודכן, פתח את הקישור עצמו (לא עותק שמור) ורענן את הדף';let wipeArm=false;$('wipe').onclick=()=>{if(!wipeArm){wipeArm=true;$('wipe').textContent='בטוח? לחץ שוב למחיקה';setTimeout(()=>{wipeArm=false;$('wipe').textContent='🗑️ מחק את כל הנתונים במכשיר הזה'},4000);return}try{localStorage.removeItem('shiftRoster');localStorage.removeItem('shift');localStorage.removeItem('shiftPal');localStorage.removeItem('shiftHist')}catch(e){}location.reload()};pre(new Date().getHours()>=13?'a':'m',true);restoreLast();setInterval(tick,30000);
 
 
 (function(){const sp=document.getElementById('splash');if(!sp)return;let seen=false;try{seen=!!sessionStorage.getItem('splashSeen')}catch(e){}
