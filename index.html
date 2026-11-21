@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>סידור עמדות מערך חוץ</title>
@@ -10,7 +11,7 @@
 html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 130px)}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.5 "Segoe UI","Arial","Helvetica Neue",system-ui,sans-serif;max-width:560px;margin-inline:auto;padding:0 14px 40px;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.5 "Fredoka","Segoe UI","Arial","Helvetica Neue",system-ui,sans-serif;max-width:560px;margin-inline:auto;padding:0 14px 40px;-webkit-tap-highlight-color:transparent}
 button{font:inherit;cursor:pointer}
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;height:var(--hh);display:flex;align-items:center;gap:12px;background:var(--card);margin:0 -14px;padding:0 14px;box-shadow:0 1px 0 var(--line)}
 #logo{width:44px;height:44px;flex:none;display:flex;align-items:center;justify-content:center;background:#fff;border-radius:10px;padding:3px}
@@ -220,6 +221,10 @@ body{max-width:none;padding:0 0 40px}
 .sumg b{display:block;font-size:1.6rem;line-height:1.1;color:var(--ink);font-variant-numeric:tabular-nums}
 .sumg span{font-size:.85rem;color:var(--mut)}
 .sumn{margin:10px 2px 0;font-size:.9rem;color:var(--mut)}
+
+/* פינות מרובעות */
+*{border-radius:6px!important}table,tr,th,td,tbody,thead{border-radius:0!important}.stepn,.hs>b,.pal,.lc button,.hr button,.cn button{border-radius:50%!important}.card,.slot,.gc{border-radius:8px!important}
+button,input,select,textarea{font-family:inherit}
 </style>
 <link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><link rel="manifest" href="manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="סידור עמדות"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="theme-color" content="#1b6b4a">
@@ -594,11 +599,11 @@ function drawImg(idx){const{a,L,S,e,rm,best}=last,W0=720,pad=24,rh=46;
 const bl=idx.map(i=>{const r=best.rows[i];return{t:fm(a+i*L)+' – '+fm(i===S-1?e:a+(i+1)*L),rows:SHOWN(rm,i).map(d=>[LB(d,i),rm[i].includes(d)?'---':(r.asg[d]||'—'),PM[d].t==='si'&&!rm[i].includes(d)]),br:r.br.join(', ')||'—'}});
 const H=90+bl.reduce((q,b)=>q+50+(b.rows.length+1)*rh+22,0)+10;
 const cv=document.createElement('canvas');cv.width=W0;cv.height=H;const c=cv.getContext('2d');c.direction='rtl';c.textAlign='right';
-c.fillStyle='#fff';c.fillRect(0,0,W0,H);c.fillStyle='#1b6b4a';c.fillRect(0,0,W0,70);c.fillStyle='#fff';c.font='bold 30px Arial';c.fillText(T0,W0-pad,46);
+c.fillStyle='#fff';c.fillRect(0,0,W0,H);c.fillStyle='#1b6b4a';c.fillRect(0,0,W0,70);c.fillStyle='#fff';c.font='bold 30px Fredoka, Arial';c.fillText(T0,W0-pad,46);
 let y=90;const mx=W0-2*pad-190;
-bl.forEach(b=>{c.fillStyle='#1b6b4a';c.font='bold 28px Arial';c.fillText(b.t,W0-pad,y+34);y+=50;
-b.rows.forEach(([p,x,si],k)=>{c.fillStyle=si?'#e2f3e8':(k%2?'#f6faf7':'#fff');c.fillRect(pad,y,W0-2*pad,rh);c.fillStyle='#5a6e62';c.font='22px Arial';c.fillText(p,W0-pad-10,y+31);c.fillStyle='#10231a';c.font='bold 24px Arial';c.fillText(x,W0-pad-170,y+31,mx);y+=rh});
-c.fillStyle='#fff3cf';c.fillRect(pad,y,W0-2*pad,rh);c.fillStyle='#7a5a10';c.font='22px Arial';c.fillText('הפסקה',W0-pad-10,y+31);c.fillStyle='#10231a';c.font='bold 22px Arial';c.fillText(b.br,W0-pad-170,y+31,mx);y+=rh+22});
+bl.forEach(b=>{c.fillStyle='#1b6b4a';c.font='bold 28px Fredoka, Arial';c.fillText(b.t,W0-pad,y+34);y+=50;
+b.rows.forEach(([p,x,si],k)=>{c.fillStyle=si?'#e2f3e8':(k%2?'#f6faf7':'#fff');c.fillRect(pad,y,W0-2*pad,rh);c.fillStyle='#5a6e62';c.font='22px Fredoka, Arial';c.fillText(p,W0-pad-10,y+31);c.fillStyle='#10231a';c.font='bold 24px Fredoka, Arial';c.fillText(x,W0-pad-170,y+31,mx);y+=rh});
+c.fillStyle='#fff3cf';c.fillRect(pad,y,W0-2*pad,rh);c.fillStyle='#7a5a10';c.font='22px Fredoka, Arial';c.fillText('הפסקה',W0-pad-10,y+31);c.fillStyle='#10231a';c.font='bold 22px Fredoka, Arial';c.fillText(b.br,W0-pad-170,y+31,mx);y+=rh+22});
 return cv}
 function shareImg(idx){if(!last)return;const cv=drawImg(idx);cv.toBlob(b=>{if(!b)return;const f=new File([b],'seder.png',{type:'image/png'}),u=cv.toDataURL('image/png');
 let o=$('imgov');if(!o){o=document.createElement('div');o.id='imgov';o.style.cssText='position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.75);overflow:auto;padding:16px';document.body.appendChild(o)}
