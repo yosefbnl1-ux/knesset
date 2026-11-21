@@ -309,7 +309,7 @@ const mk=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)};
 let MO=mk(),OPEN=null,skipRec=null,openSet=null;
 function monthCheck(){if(MO!==mk()){Object.keys(hist).forEach(k=>delete hist[k]);recd=null;MO=mk();save()}}
 function sumUI(){const g=document.getElementById('sumg');if(!g)return;const nm=names(),c=nm.filter(n=>cert.has(n)).length,ls=nm.filter(n=>fin.has(n)),a=hm($('st').value||'0:0'),e=hm($('en').value||'0:0'),L=Math.min(120,Math.max(10,+$('len').value||40)),S=Math.max(0,Math.floor((e-a)/L));
-g.innerHTML=[[nm.length,'מאבטחים במשמרת'],[c,'מוסמכים ★'],[ls.length,'אחרונים'],[S,'איקסים של '+L+' דקות']].map(([v,t])=>`<div><b>${v}</b><span>${t}</span></div>`).join('');
+g.innerHTML=[[nm.length,'מאבטחים במשמרת'],[c,'מוסמכים ★'],[ls.length,'אחרונות'],[S,'איקסים של '+L+' דקות']].map(([v,t])=>`<div><b>${v}</b><span>${t}</span></div>`).join('');
 document.getElementById('sumn').textContent=($('st').value&&$('en').value?'משמרת '+$('st').value+'–'+$('en').value:'')+(ls.length?' · אחרונים: '+ls.join(', '):'')}
 let MAN={};
 function man0(){const a=hm($('st').value||'0:0'),t=id=>$(id).value?hm($(id).value):1e9,o=['סנח'];if(a>=t('r1'))o.push('23 ב');if(a>=t('r3'))o.push('26');if(a>=t('r2'))o.push('27');if(a>=t('r7'))o.push('סיור ב');if(a>=t('r8'))o.push('סיור א','סיור ב');const p=$('p26').value?hm($('p26').value):0;if(p&&a<p)o.push('26');return o}
@@ -641,7 +641,7 @@ const t=T0+' · '+d.getDate()+'.'+(d.getMonth()+1)+'.'+d.getFullYear()+' · '+(c
 L.unshift({k,d:d.getDate()+'.'+(d.getMonth()+1),m:curMode==='m'?'בוקר':'צהריים',t});localStorage.setItem('shiftHist',JSON.stringify(L.slice(0,14)))}catch(e){}histUI()}
 function histUI(){const L=histGet();$('hist2').innerHTML=L.length?`<details class="card hh"><summary>🗂️ סידורים קודמים (${L.length})</summary>${L.map((z,i)=>`<details><summary>${esc(z.d)} · ${esc(z.m)}</summary><pre>${esc(z.t)}</pre><a class="wa" target="_blank" rel="noopener" href="${waUrl(z.t)}">שלח בווצאפ</a></details>`).join('')}</details>`:''}
 load();chips();gatesUI();setLogo();histUI();['r4','r5','r6'].forEach(id=>{$(id).oninput=gatesUI});
-const VER='21.11.2026 · גרסה 58';$('ver').textContent='גרסה: '+VER+' · אם זה נראה לך לא מעודכן, פתח את הקישור עצמו (לא עותק שמור) ורענן את הדף';let wipeArm=false;$('wipe').onclick=()=>{if(!wipeArm){wipeArm=true;$('wipe').textContent='בטוח? לחץ שוב למחיקה';setTimeout(()=>{wipeArm=false;$('wipe').textContent='🗑️ מחק את כל הנתונים במכשיר הזה'},4000);return}try{localStorage.removeItem('shiftRoster');localStorage.removeItem('shift');localStorage.removeItem('shiftPal');localStorage.removeItem('shiftHist')}catch(e){}location.reload()};pre(new Date().getHours()>=13?'a':'m',true);restoreLast();setInterval(tick,30000);
+const VER='21.11.2026 · גרסה 59';$('ver').textContent='גרסה: '+VER+' · אם זה נראה לך לא מעודכן, פתח את הקישור עצמו (לא עותק שמור) ורענן את הדף';let wipeArm=false;$('wipe').onclick=()=>{if(!wipeArm){wipeArm=true;$('wipe').textContent='בטוח? לחץ שוב למחיקה';setTimeout(()=>{wipeArm=false;$('wipe').textContent='🗑️ מחק את כל הנתונים במכשיר הזה'},4000);return}try{localStorage.removeItem('shiftRoster');localStorage.removeItem('shift');localStorage.removeItem('shiftPal');localStorage.removeItem('shiftHist')}catch(e){}location.reload()};pre(new Date().getHours()>=13?'a':'m',true);restoreLast();setInterval(tick,30000);
 
 
 (function(){const sp=document.getElementById('splash');if(!sp)return;let seen=false;try{seen=!!sessionStorage.getItem('splashSeen')}catch(e){}
