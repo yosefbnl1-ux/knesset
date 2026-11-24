@@ -144,7 +144,7 @@ nav.main button.on{background:var(--ink);color:#fff}
 .nm{flex:0 1 auto}
 .sp{flex:1}
 .star{background:none;border:0;font-size:1.2rem;line-height:1;color:#b9c7be;padding:0 8px;min-width:34px;min-height:44px}
-.star.on{color:var(--cert)}
+.star.on{color:var(--cert)}.star small,.st small{font-size:.55em;font-weight:700;vertical-align:super;margin-inline-start:1px}
 .star.dal{filter:grayscale(1);opacity:.35;font-size:1.05rem;padding:0 4px;min-width:30px}.star.dal.on{filter:none;opacity:1}
 .sec{font-size:.8rem;color:var(--mut);margin:14px 0 4px;font-weight:700}
 .nm:disabled{opacity:.55}
@@ -300,7 +300,7 @@ const POS=[
 {id:'23 א',k:'23',t:'sd',lab:'23'},{id:'23 ב',k:'23',t:'sd',lab:'23'},{id:'26',k:'26',t:'sd',lab:'26'},{id:'27',k:'27',t:'sd',lab:'27'},{id:'סנח',k:'סנח',t:'sd',lab:'סנ"ח'}];
 const DISP=['23 א','23 ב','24','25','26','27','29','סיור א','סיור ב','סנח'];
 const DROP=['סנח','סיור ב','23 ב','סיור א','27','26','25'];
-const cert=new Set(),fin=new Set(),DAL=new Set(),KON=new Set();let SPLIT=[];let last=null,view='post';
+const cert=new Set(),fin=new Set(),DAL=new Set(),KON=new Set(),C29=new Set();const canDo=(x,id)=>cert.has(x)||(id==='29'&&C29.has(x));const SM=x=>cert.has(x)?'<i class="st">★</i>':C29.has(x)?'<i class="st">★<small>29</small></i>':'';let SPLIT=[];let last=null,view='post';
 
 let roster=[],srch='',edMode=false,recd=null,nL=3,rstArm=false,curMode='m';const hist={},LNG=new Set(),JOIN=new Set(),NITE=new Set(),GATES={'24':1,'25':0,'29':1};const today=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()};const off=new Set();
 function names(){return roster.filter(n=>!off.has(n)&&!(curMode==='a'&&KON.has(n)))}
@@ -315,7 +315,7 @@ let MAN={};
 function man0(){const a=hm($('st').value||'0:0'),t=id=>$(id).value?hm($(id).value):1e9,o=['סנח'];if(a>=t('r1'))o.push('23 ב');if(a>=t('r3'))o.push('26');if(a>=t('r2'))o.push('27');if(a>=t('r7'))o.push('סיור ב');if(a>=t('r8')&&!(a>=t('r8e')))o.push('סיור א','סיור ב');const p=$('p26').value?hm($('p26').value):0;if(p&&a<p)o.push('26');return o}
 function manUI(){const box=$('mang');if(!box)return;const nm=names().sort(he),hide=man0();Object.keys(MAN).forEach(k=>{if(!nm.includes(MAN[k])||hide.includes(k))delete MAN[k]});
 const ps=DISP.filter(d=>!hide.includes(d)&&!PM[d].ex);
-box.innerHTML=ps.map(d=>{const cur=MAN[d]||'',used=new Set(Object.entries(MAN).filter(([k])=>k!==d).map(([,v])=>v));return `<label>${PM[d].lab}${PM[d].lab!==d?' ('+d.slice(-1)+')':''}${PM[d].cert?' ★':''}<select data-p="${d}" class="${cur?'on':''}"><option value="">—</option>${nm.filter(x=>!used.has(x)).map(x=>`<option value="${esc(x)}"${x===cur?' selected':''}>${esc(x)}${cert.has(x)?' ★':''}</option>`).join('')}</select></label>`}).join('');
+box.innerHTML=ps.map(d=>{const cur=MAN[d]||'',used=new Set(Object.entries(MAN).filter(([k])=>k!==d).map(([,v])=>v));return `<label>${PM[d].lab}${PM[d].lab!==d?' ('+d.slice(-1)+')':''}${PM[d].cert?' ★':''}<select data-p="${d}" class="${cur?'on':''}"><option value="">—</option>${nm.filter(x=>!used.has(x)).map(x=>`<option value="${esc(x)}"${x===cur?' selected':''}>${esc(x)}${cert.has(x)?' ★':C29.has(x)?' ★29':''}</option>`).join('')}</select></label>`}).join('');
 box.querySelectorAll('select').forEach(el=>el.onchange=()=>{if(el.value)MAN[el.dataset.p]=el.value;else delete MAN[el.dataset.p];manUI()});
 const k=Object.keys(MAN).length;$('mans').textContent=k?'· שובצו '+k:'';$('manc').style.display=k?'':'none'}
 function manRow(g,W){const asg={};for(const[id,x]of Object.entries(MAN)){const w=W.win[x];if(g.includes(x)&&w&&w[0]<=0&&!((W.gap||{})[x]||[]).some(([a,b])=>0>=a&&0<b))asg[id]=x}if(!Object.keys(asg).length)return null;const used=new Set(Object.values(asg));return{asg,br:g.filter(x=>!used.has(x)&&W.win[x][0]<=0&&!((W.gap||{})[x]||[]).some(([a,b])=>0>=a&&0<b))}}
@@ -336,12 +336,12 @@ const on=vis.filter(n=>!off.has(n)).sort(he),no=vis.filter(n=>off.has(n)).sort(h
 const row=n=>{const s=!off.has(n),e=esc(n),open=s&&OPEN===n,lst=fin.has(n),blk=(!A&&LNG.has(n));
 const tags=s?`${KON.has(n)?`<span class="tag">כונן${curMode==='a'?' · לא בסידור':''}</span>`:''}${LNG.has(n)?'<span class="tag">שילדי יום</span>':''}${JOIN.has(n)?'<span class="tag j">שילדי לילה</span>':''}${lst?(JOIN.has(n)?'<span class="tag l">ראשונה 🌙</span>':'<span class="tag l">אחרונה 🏠</span>'):''}`:'';
 const pl=open?`<div class="pl"><button class="tg f${KON.has(n)?' on':''}" data-n="${e}" data-k="k">כונן</button><button class="tg f${LNG.has(n)?' on':''}" data-n="${e}" data-k="l">שילדי יום</button>${A?`<button class="tg f${JOIN.has(n)?' on':''}" data-n="${e}" data-k="j">שילדי לילה</button>`:''}<button class="tg f${lst?' on':''}" data-n="${e}" data-k="t"${blk?' disabled':''}>${JOIN.has(n)?(lst?'ראשונה 🌙':'ראשונה'):(lst?'אחרונה 🏠':'אחרונה')}</button></div>`:'';
-return `<div class="g${s?'':' off'}"><button class="nm" data-n="${e}" data-k="p"><span class="ck">${s?'✓':''}</span>${e}</button><button class="star${cert.has(n)?' on':''}" data-n="${e}" data-k="c" aria-label="מוסמך">${cert.has(n)?'★':'☆'}</button><button class="star dal${DAL.has(n)?' on':''}" data-n="${e}" data-k="d" aria-label="דאלס" title="דאלס (נהיגה ברכב)">🚗</button>${tags}<span class="sp"></span>${s?`<button class="mn" data-n="${e}" data-k="m" aria-label="אפשרויות">${open?'▴':'⋯'}</button>`:''}${edMode?`<button class="tg" data-n="${e}" data-k="x">✕</button>`:''}${pl}</div>`};
+return `<div class="g${s?'':' off'}"><button class="nm" data-n="${e}" data-k="p"><span class="ck">${s?'✓':''}</span>${e}</button><button class="star${cert.has(n)?' on':C29.has(n)?' on half':''}" data-n="${e}" data-k="c" aria-label="מוסמך">${cert.has(n)?'★':C29.has(n)?'★<small>29</small>':'☆'}</button><button class="star dal${DAL.has(n)?' on':''}" data-n="${e}" data-k="d" aria-label="דאלס" title="דאלס (נהיגה ברכב)">🚗</button>${tags}<span class="sp"></span>${s?`<button class="mn" data-n="${e}" data-k="m" aria-label="אפשרויות">${open?'▴':'⋯'}</button>`:''}${edMode?`<button class="tg" data-n="${e}" data-k="x">✕</button>`:''}${pl}</div>`};
 $('chips').innerHTML=(on.map(row).join('')+(on.length&&no.length?'<p class="sec">לא במשמרת</p>':'')+no.map(row).join(''))||(srch?'<p class="hint">אין מאבטח כזה במאגר. הקש "הוסף" כדי להוסיף אותו.</p>':'<p class="hint">המאגר ריק. כתוב שם למעלה והקש "הוסף".</p>');
 const k=names().length;$('cnt').textContent='נבחרו '+k+' מתוך '+roster.length;$('go').textContent=k?'בנה סידור ('+k+' מאבטחים)':'בנה סידור';
 lastsUI();
 document.querySelectorAll('#chips button').forEach(b=>b.onclick=()=>{const n=b.dataset.n,k=b.dataset.k;
-if(k==='x'){roster=roster.filter(z=>z!==n);cert.delete(n);DAL.delete(n);[off,fin,LNG,JOIN,NITE,KON].forEach(z=>z.delete(n))}
+if(k==='x'){roster=roster.filter(z=>z!==n);cert.delete(n);C29.delete(n);DAL.delete(n);[off,fin,LNG,JOIN,NITE,KON].forEach(z=>z.delete(n))}
 else if(k==='p'){if(off.has(n))off.delete(n);else{off.add(n);if(OPEN===n)OPEN=null;[fin,LNG,JOIN,NITE,KON].forEach(z=>z.delete(n))}}
 else if(k==='k'){if(KON.has(n))KON.delete(n);else{KON.add(n);LNG.delete(n);JOIN.delete(n);if(curMode==='a'){fin.delete(n);NITE.delete(n)}}}
 else if(k==='l'){if(LNG.has(n))LNG.delete(n);else{LNG.add(n);KON.delete(n);JOIN.delete(n);if(curMode==='m'){fin.delete(n);NITE.delete(n)}}}
@@ -350,11 +350,11 @@ else if(k==='j'){if(JOIN.has(n))JOIN.delete(n);else{JOIN.add(n);KON.delete(n);LN
 else if(k==='t'&&JOIN.has(n)){if(fin.has(n)){fin.delete(n);NITE.delete(n)}else{fin.add(n);NITE.add(n)}}
 else if(k==='t'){if(fin.has(n)){fin.delete(n);NITE.delete(n)}else fin.add(n)}
 else if(k==='d'){DAL.has(n)?DAL.delete(n):DAL.add(n)}
-else{cert.has(n)?cert.delete(n):cert.add(n)}
+else{if(cert.has(n))cert.delete(n);else if(C29.has(n)){C29.delete(n);cert.add(n)}else C29.add(n)}
 chips();save()})}
-function save(){try{localStorage.setItem('shiftRoster',JSON.stringify({r:roster,c:[...cert],dl:[...DAL],f:[...fin],fd:today(),o:[...off],h:hist,rc:recd,lg:[...LNG],jn:[...JOIN],nt:[...NITE],kn:[...KON],gt:GATES,gtv:2,mo:MO}))}catch(e){}}
+function save(){try{localStorage.setItem('shiftRoster',JSON.stringify({r:roster,c:[...cert],c29:[...C29],dl:[...DAL],f:[...fin],fd:today(),o:[...off],h:hist,rc:recd,lg:[...LNG],jn:[...JOIN],nt:[...NITE],kn:[...KON],gt:GATES,gtv:2,mo:MO}))}catch(e){}}
 function load(){try{const d=JSON.parse(localStorage.getItem('shiftRoster')||'null');
-if(d){roster=d.r||[];(d.c||[]).forEach(x=>cert.add(x));(d.dl||[]).forEach(x=>DAL.add(x));if(d.fd===today()){(d.f||[]).forEach(x=>fin.add(x));(d.lg||[]).forEach(x=>LNG.add(x));(d.jn||[]).forEach(x=>JOIN.add(x));(d.nt||[]).forEach(x=>NITE.add(x));(d.kn||[]).forEach(x=>KON.add(x));[...NITE].forEach(x=>{if(!JOIN.has(x))NITE.delete(x)})}(d.o||[]).forEach(x=>off.add(x));Object.assign(hist,d.h||{});if(d.gt&&d.gtv===2)Object.assign(GATES,d.gt);recd=d.rc||null;MO=d.mo||mk();roster.sort(he);monthCheck()}
+if(d){roster=d.r||[];(d.c||[]).forEach(x=>cert.add(x));(d.c29||[]).forEach(x=>C29.add(x));(d.dl||[]).forEach(x=>DAL.add(x));if(d.fd===today()){(d.f||[]).forEach(x=>fin.add(x));(d.lg||[]).forEach(x=>LNG.add(x));(d.jn||[]).forEach(x=>JOIN.add(x));(d.nt||[]).forEach(x=>NITE.add(x));(d.kn||[]).forEach(x=>KON.add(x));[...NITE].forEach(x=>{if(!JOIN.has(x))NITE.delete(x)})}(d.o||[]).forEach(x=>off.add(x));Object.assign(hist,d.h||{});if(d.gt&&d.gtv===2)Object.assign(GATES,d.gt);recd=d.rc||null;MO=d.mo||mk();roster.sort(he);monthCheck()}
 else{const o=JSON.parse(localStorage.getItem('shift')||'null');if(o){roster=[...new Set((o.n||'').split('\n').map(z=>z.trim()).filter(Boolean))];(o.c||[]).forEach(x=>cert.add(x))}}}catch(e){}}
 function addNames(t){t.split('\n').map(z=>z.trim()).filter(Boolean).forEach(l=>{const m=l.match(/^(.*?)\s*([*!]*)$/),n=m[1].trim();if(!n)return;if(!roster.includes(n))roster.push(n);if(m[2].includes('*'))cert.add(n);if(m[2].includes('!'))fin.add(n)});roster.sort(he)}
 $('addl').onclick=()=>{addNames($('names').value);$('names').value='';chips();save()};
@@ -364,7 +364,7 @@ $('edm').onclick=()=>{edMode=!edMode;$('edm').textContent=edMode?'✔ סיום':
 function lastsUI(){
 const g=[...roster].sort(he),d=new Date();
 $('lmo').textContent=(d.getMonth()+1)+'/'+d.getFullYear();
-$('lrows').innerHTML=g.map(n=>{const e=esc(n);return `<div class="lr"><span class="nm2">${e}${cert.has(n)?'<i class="st">★</i>':''}</span><span class="cn"><button data-n="${e}" data-k="hm" aria-label="פחות">−</button><b>${hist[n]||0}</b><button data-n="${e}" data-k="hp" aria-label="יותר">+</button></span></div>`}).join('')||'<p class="hint">המאגר ריק.</p>';
+$('lrows').innerHTML=g.map(n=>{const e=esc(n);return `<div class="lr"><span class="nm2">${e}${SM(n)}</span><span class="cn"><button data-n="${e}" data-k="hm" aria-label="פחות">−</button><b>${hist[n]||0}</b><button data-n="${e}" data-k="hp" aria-label="יותר">+</button></span></div>`}).join('')||'<p class="hint">המאגר ריק.</p>';
 $('lcount').textContent=nL;
 document.querySelectorAll('#lrows button').forEach(b=>b.onclick=()=>{const n=b.dataset.n;hist[n]=Math.max(0,(hist[n]||0)+(b.dataset.k==='hp'?1:-1));chips();save()})}
 function modeUI(){remUI();gatesUI()}
@@ -405,27 +405,28 @@ const lastsF=G.filter(x=>isLast(x,s)),fb=(forceBr&&G.includes(forceBr))?[forceBr
 let need=0;
 if(isL[s]){const left=isL.slice(s).filter(Boolean).length;const U=G.filter(x=>st[x].ate<0).length;need=Math.ceil(U/left)}
 nb=Math.min(n,Math.max(nb,need));
-const lim=Math.max(0,C-act.filter(p=>p.cert).length);let cb=0;const dN=act.filter(p=>p.dal).length,limD=Math.max(0,Dc-dN);let db=0;const br=[];
+const g29=act.some(p=>p.id==='29'&&p.cert),isC=x=>cert.has(x)||(g29&&C29.has(x)),C2=G.filter(isC).length,lim=Math.max(0,C2-act.filter(p=>p.cert).length),limF=Math.max(0,C-act.filter(p=>p.cert&&p.id!=='29').length);let cb=0,cbF=0;const cOK=x=>cert.has(x)?(cb<lim&&cbF<limF):isC(x)?cb<lim:true;const dN=act.filter(p=>p.dal).length,limD=Math.max(0,Dc-dN);let db=0;const br=[];
 const srt=a=>a.slice().sort((a,b)=>(((st[b].wk>=WKMAX)*2+(st[b].run>=2))-((st[a].wk>=WKMAX)*2+(st[a].run>=2)))||(st[a].br-(st[a].run>=2?1:0))-(st[b].br-(st[b].run>=2?1:0))||st[a].br-st[b].br||st[a].lb-st[b].lb||Math.random()-.5);
 const nl=x=>fin.has(x)&&!nol.has(x)&&win[x][1]===s+2;const nf=x=>nol.has(x)&&win[x][1]===s+1;
-const snAct=!!act.find(p=>p.id==='סנח'),keepP=x=>!(snAct&&st[x].lp==='סיור'&&G.filter(y=>st[y].lp==='סיור'&&!br.includes(y)).length<=1),ok=x=>(!cert.has(x)||cb<lim)&&(!DAL.has(x)||db<limD)&&st[x].lb!==s-1&&!nl(x)&&!nf(x)&&keepP(x),ok2=x=>(!cert.has(x)||cb<lim)&&(!DAL.has(x)||db<limD)&&!nl(x)&&!nf(x),ok3=x=>(!cert.has(x)||cb<lim)&&(!DAL.has(x)||db<limD)&&!nf(x);
-const take=x=>{br.push(x);if(cert.has(x))cb++;if(DAL.has(x))db++;if(st[x].lb===s-1)DB++};fz.forEach(take);const PB=((s===0||s===1)&&W.first)?G.filter(x=>W.first.has(x)&&st[x].lb<0):[];for(const x of srt(PB)){if(br.length>=nb)break;if(!br.includes(x)&&(!cert.has(x)||cb<lim))take(x)}
+const snAct=!!act.find(p=>p.id==='סנח'),keepP=x=>!(snAct&&st[x].lp==='סיור'&&G.filter(y=>st[y].lp==='סיור'&&!br.includes(y)).length<=1),ok=x=>cOK(x)&&(!DAL.has(x)||db<limD)&&st[x].lb!==s-1&&!nl(x)&&!nf(x)&&keepP(x),ok2=x=>cOK(x)&&(!DAL.has(x)||db<limD)&&!nl(x)&&!nf(x),ok3=x=>cOK(x)&&(!DAL.has(x)||db<limD)&&!nf(x);
+const take=x=>{br.push(x);if(isC(x))cb++;if(cert.has(x))cbF++;if(DAL.has(x))db++;if(st[x].lb===s-1)DB++};fz.forEach(take);const PB=((s===0||s===1)&&W.first)?G.filter(x=>W.first.has(x)&&st[x].lb<0):[];for(const x of srt(PB)){if(br.length>=nb)break;if(!br.includes(x)&&cOK(x))take(x)}
 for(const f of [ok,ok2,ok3,x=>true])for(const x of srt(G.filter(x=>st[x].ate<0&&!br.includes(x)))){if(br.length>=need)break;if(f(x))take(x)}
 const AR=s>0?G.filter(x=>win[x][0]===s||((W.gap||{})[x]||[]).some(([,b2])=>b2===s)):[],nA=x=>!AR.includes(x);for(const f of [x=>ok(x)&&nA(x),ok,x=>ok2(x)&&nA(x),ok2,x=>ok3(x)&&nA(x),ok3])for(const x of srt(G.filter(x=>!br.includes(x)))){if(br.length>=nb)break;if(f(x))take(x)}
 const av=G.filter(x=>!br.includes(x));
 {const dp=act.filter(p=>p.dal);let k=dp.length-av.filter(x=>DAL.has(x)).length;for(let i=dp.length-1;k>0&&i>=0;i--,k--)dp[i].dal=0}
 let ps=act.slice();
 for(const d of DROP){if(ps.length<=av.length)break;ps=ps.filter(p=>p.id!==d)}
-{const cAv=av.filter(x=>cert.has(x)).length;let nc=ps.filter(p=>p.cert).length;ps=ps.map(p=>(p.id==='25'&&p.cert&&nc>cAv)?(nc--,{...p,cert:0}):p)}
-ps.sort((a,b)=>((b.cert?2:0)+(b.t==='si'?1:0))-((a.cert?2:0)+(a.t==='si'?1:0)));
+{const cAv=av.filter(x=>cert.has(x)).length+(ps.some(p=>p.id==='29'&&p.cert)&&av.some(x=>C29.has(x)&&!cert.has(x))?1:0);let nc=ps.filter(p=>p.cert).length;ps=ps.map(p=>(p.id==='25'&&p.cert&&nc>cAv)?(nc--,{...p,cert:0}):p)}
+ps.sort((a,b)=>((b.cert?2:0)+(b.t==='si'?1:0))-((a.cert?2:0)+(a.t==='si'?1:0))||((a.id==='29')-(b.id==='29')));
 const asg={},used=new Set();
 const needC=ps.filter(p=>p.cert).length;
 const prevA=rows.length?rows[rows.length-1].asg:{},prevP={};for(const k in prevA)prevP[prevA[k]]=k;
 const place=(p,res,only)=>{let best=null,bc=1e9;
-for(const x of av){if(used.has(x)||(p.cert&&!cert.has(x))||(p.dal&&!DAL.has(x))||(only&&!only(x)))continue;
+const feas=ex=>{const U=ps.filter(q=>q.cert&&!asg[q.id]&&q.id!==p.id),nF=U.filter(q=>q.id!=='29').length,n9=U.length-nF,fa=av.filter(y=>y!==ex&&!used.has(y)&&cert.has(y)).length,ha=av.filter(y=>y!==ex&&!used.has(y)&&!cert.has(y)&&C29.has(y)).length;return fa>=nF&&fa+ha>=nF+n9};
+for(const x of av){if(used.has(x)||(p.cert&&!canDo(x,p.id))||(p.dal&&!DAL.has(x))||(only&&!only(x)))continue;
 if(res&&!p.dal&&DAL.has(x)){const rd=ps.filter(q=>q.dal&&!asg[q.id]).length;if(rd&&av.filter(y=>DAL.has(y)&&!used.has(y)).length<=rd)continue}
-if(res&&!p.cert&&cert.has(x)&&av.filter(y=>cert.has(y)&&!used.has(y)).length<=needC)continue;
-const c=1.5*(st[x].pk[p.k]||0)+3*st[x][p.t]+(st[x].lp===p.k?(p.t==='sd'?-6:2):0)+(NOREP.has(p.k)&&st[x].lp===p.k?NRB:0)+(p.t==='si'&&st[x].lb===s-1?50:0)+(s===0&&p.t==='si'&&W.first&&W.first.has(x)?-200:0)+(farMv(st[x].lp,p.k)?FARB:0)+(st[x].lp==='25'&&p.t==='sd'?P25B:0)+(p.t==='sd'&&st[x].run>=2?400:0)+(p.t==='si'&&st[x].run>=2?-60:0)+(p.t==='si'?(st[x].lt==='sd'?-3:st[x].lt==='si'?SITSIT:0):0)+((()=>{const q=prevP[x];if(!q||PM[q].k===p.k||swOkK(p.k,PM[q].k))return false;const Kq=PM[q].k;return Object.entries(asg).some(([pid,y])=>PM[pid].k===Kq&&prevP[y]&&PM[prevP[y]].k===p.k)})()?SWP:0)+Math.random();
+if(res&&!p.cert&&(cert.has(x)||C29.has(x))&&!feas(x))continue;
+const c=(p.id==='29'&&p.cert&&!cert.has(x)&&C29.has(x)?-H29B:0)+1.5*(st[x].pk[p.k]||0)+3*st[x][p.t]+(st[x].lp===p.k?(p.t==='sd'?-6:2):0)+(NOREP.has(p.k)&&st[x].lp===p.k?NRB:0)+(p.t==='si'&&st[x].lb===s-1?50:0)+(s===0&&p.t==='si'&&W.first&&W.first.has(x)?-200:0)+(farMv(st[x].lp,p.k)?FARB:0)+(st[x].lp==='25'&&p.t==='sd'?P25B:0)+(p.t==='sd'&&st[x].run>=2?400:0)+(p.t==='si'&&st[x].run>=2?-60:0)+(p.t==='si'?(st[x].lt==='sd'?-3:st[x].lt==='si'?SITSIT:0):0)+((()=>{const q=prevP[x];if(!q||PM[q].k===p.k||swOkK(p.k,PM[q].k))return false;const Kq=PM[q].k;return Object.entries(asg).some(([pid,y])=>PM[pid].k===Kq&&prevP[y]&&PM[prevP[y]].k===p.k)})()?SWP:0)+Math.random();
 if(c<bc){bc=c;best=x}}
 if(best){asg[p.id]=best;used.add(best);if(p.t==='si'&&st[best].lb===s-1)RT++}};
 const snP=ps.find(p=>p.id==='סנח');if(snP){place(snP,true,x=>st[x].lp==='סיור');if(!asg[snP.id])place(snP,true)}
@@ -451,7 +452,7 @@ return{rows,st,score,uneaten,miss}}
 const PM={};POS.forEach(q=>PM[q.id]=q);const LB=(d,i)=>{if((d==='סיור א'||d==='סיור ב')&&SPLIT.some(z=>i>=z.from&&i<z.to))return d==='סיור א'?'סיור מזרחי':'סיור מערבי';return PM[d].lab};const SENDTO=(rows,i,d)=>{if(!i||!rows[i]||!rows[i-1])return '';const x=rows[i].asg[d],p=rows[i-1].asg[d];if(!x)return '';{const K=PM[d].k,px=Object.keys(rows[i-1].asg).find(q=>rows[i-1].asg[q]===x);if(px&&PM[px].k!==K){const Kx=PM[px].k,yd=Object.keys(rows[i].asg).find(q=>PM[q].k===Kx&&rows[i].asg[q]!==x&&Object.keys(rows[i-1].asg).some(r=>rows[i-1].asg[r]===rows[i].asg[q]&&PM[r].k===K));if(yd)return 'ראש בראש '+LB(yd,i)}}if(!p||p===x)return '';const to=Object.keys(rows[i].asg).find(q=>rows[i].asg[q]===p);if(to&&rows[i-1].asg[to]===x)return 'ראש בראש '+LB(to,i);return to?'← '+LB(to,i):(rows[i].br.includes(p)?'← הפסקה':'')};const SHOWN=(rm,i)=>DISP.filter(d=>!rm[i].includes(d)||(!PM[d].ex&&d!=='סנח'));
 let EXTRA=[];const SWSIT=new Set(['סיור א','סיור ב','25']),SWSTD=new Set(['24','26','27','29']);const swOk=(a,b)=>(SWSIT.has(a)&&SWSTD.has(b))||(SWSIT.has(b)&&SWSTD.has(a));const KSI=new Set(['סיור','25']),KSD=new Set(['24','26','27','29']);const swOkK=(a,b)=>(KSI.has(a)&&KSD.has(b))||(KSI.has(b)&&KSD.has(a));
 let NOREP=new Set(['26']),NRB=30,NRP=15;let SITSIT=40,SITPOL=30,SWP=45,SWPOL=25,WKMAX=3,WKPOL=70;
-const FG1=new Set(['23','26']),FG2=new Set(['27','29']);let FARB=60,FARP=20,P25B=0,P25P=0;const farMv=(a,b)=>(b==='23'&&(a==='סיור'||a==='25'))||(FG1.has(a)&&FG2.has(b))||(FG2.has(a)&&FG1.has(b));
+const FG1=new Set(['23','26']),FG2=new Set(['27','29']);let FARB=60,FARP=20,P25B=0,P25P=0,H29B=0;const farMv=(a,b)=>(b==='23'&&(a==='סיור'||a==='25'))||(FG1.has(a)&&FG2.has(b))||(FG2.has(a)&&FG1.has(b));
 function regExtra(x){const q={id:x.id,k:x.lab,t:x.t,lab:x.lab,ex:1};POS.push(q);PM[q.id]=q;DISP.push(q.id);DROP.push(q.id)}
 function clearExtra(){SPLIT=[];EXTRA.forEach(x=>{[POS,DISP,DROP].forEach(A=>{const i=A.findIndex(y=>(y.id||y)===x.id);if(i>=0)A.splice(i,1)});delete PM[x.id]});EXTRA=[]}
 function polish(best,g,f0,S,rm,W){
@@ -471,7 +472,7 @@ for(let it=0;it<4000;it++){
 const s=f0+Math.floor(Math.random()*(S-f0));const A=rows[s].asg,ids=Object.keys(A);if(ids.length<2)continue;
 const a=ids[Math.floor(Math.random()*ids.length)],b=ids[Math.floor(Math.random()*ids.length)];
 if(a===b||a==='סנח'||b==='סנח')continue;const x=A[a],y=A[b];const nxt=rows[s+1]&&rows[s+1].asg['סנח'];if(nxt&&(x===nxt||y===nxt))continue;
-const gt=W.gate||{'24':1,'29':1},nc=id=>gt[id]&&!rm[s].includes(id+'c'),ca=nc(a),cq=nc(b);if((ca&&!cert.has(y))||(cq&&!cert.has(x)))continue;const dl=id=>DAL.size&&W.dal&&W.dal[s]&&W.dal[s].includes(id);if((dl(a)&&!DAL.has(y))||(dl(b)&&!DAL.has(x)))continue;const R=s>0?rows[s-1].br:[];if((PM[a].t==='si'&&R.includes(y))||(PM[b].t==='si'&&R.includes(x)))continue;
+const gt=W.gate||{'24':1,'29':1},nc=id=>gt[id]&&!rm[s].includes(id+'c'),ca=nc(a),cq=nc(b);if((ca&&!canDo(y,a))||(cq&&!canDo(x,b)))continue;const dl=id=>DAL.size&&W.dal&&W.dal[s]&&W.dal[s].includes(id);if((dl(a)&&!DAL.has(y))||(dl(b)&&!DAL.has(x)))continue;const R=s>0?rows[s-1].br:[];if((PM[a].t==='si'&&R.includes(y))||(PM[b].t==='si'&&R.includes(x)))continue;
 A[a]=y;A[b]=x;const e=E().e;
 if(e<=cur)cur=e;else{A[a]=x;A[b]=y}}
 const c=E().c;g.forEach(x=>{best.st[x].si=c[x].si;best.st[x].sd=c[x].sd;best.st[x].pk=c[x].pk})}
@@ -532,10 +533,10 @@ else if(NC&&C===NC)WN('יש בדיוק '+NC+' מוסמכים, כמספר עמד�
 if(fin.size&&NC&&g.filter(x=>cert.has(x)&&!fin.has(x)).length<NC)WN('בגלל ה"אחרונות" לא יישארו מספיק מוסמכים לעמדות הכניסה בסוף המשמרת');
 if(DAL.size){const bad=[];best.rows.forEach((r,i)=>{const pa=['סיור א','סיור ב'].filter(d=>!rm[i].includes(d)&&r.asg[d]),sp=(W.dal&&W.dal[i]||[]).includes('סיור ב'),has=d=>DAL.has(r.asg[d]);if(pa.length&&(sp?!pa.every(has):!pa.some(has)))bad.push(fm(a+i*L))});if(bad.length)WN('אין דאלס 🚗 בסיור באיקסים: '+bad.slice(0,6).join(', ')+(bad.length>6?' ...':''))}
 if(best.uneaten)WN(`${best.uneaten} מאבטחים לא קיבלו הפסקת אוכל בחלון - אין מספיק מאבטחים בלי להשאיר עמדה ריקה`);
-best.rows.forEach((r,i)=>{gk.forEach(d=>{if(rm[i].includes(d)||rm[i].includes(d+'c'))return;const x=r.asg[d];if(x&&!cert.has(x))WN(`באיקס ${fm(a+i*L)} בעמדה ${d} משובץ מאבטח לא מוסמך: ${esc(x)}`)})});
+best.rows.forEach((r,i)=>{gk.forEach(d=>{if(rm[i].includes(d)||rm[i].includes(d+'c'))return;const x=r.asg[d];if(x&&!canDo(x,d))WN(`באיקס ${fm(a+i*L)} בעמדה ${d} משובץ מאבטח לא מוסמך: ${esc(x)}`)})});
 const emptyL=[];best.rows.forEach((r,i)=>{const ms=DISP.filter(d=>!rm[i].includes(d)&&!r.asg[d]);if(ms.length)emptyL.push(fm(a+i*L)+' ('+[...new Set(ms.map(d=>PM[d].lab))].join(', ')+')')});
 if(emptyL.length)WN('עמדות ריקות (אין מספיק מאבטחים): '+emptyL.slice(0,6).join(' · ')+(emptyL.length>6?' ...':''));
-const nm=x=>`${esc(x)}${cert.has(x)?'<i class="st">★</i>':''}`;
+const nm=x=>`${esc(x)}${SM(x)}`;
 const dur=i=>i===S-1?e-a-i*L:L;const nowM=new Date().getHours()*60+new Date().getMinutes();const curI=best.rows.findIndex((_,k)=>nowM>=a+k*L&&nowM<(k===S-1?e:a+(k+1)*L));
 const winTxt=x=>{const w=W.win[x];if(!w)return'';const q=[];if(w[0]>0)q.push('מ-'+fm(a+w[0]*L));if(w[1]<S)q.push('עד '+fm(a+Math.min(S,w[1])*L));((W.gap||{})[x]||[]).forEach(([p,r])=>q.push('לא היה '+fm(a+p*L)+'–'+fm(a+r*L)));return q.length?` <small class="mut">(${q.join(' ')})</small>`:''};
 const opts=[...new Set([...all,...roster])];
@@ -643,7 +644,7 @@ const t=T0+' · '+d.getDate()+'.'+(d.getMonth()+1)+'.'+d.getFullYear()+' · '+(c
 L.unshift({k,d:d.getDate()+'.'+(d.getMonth()+1),m:curMode==='m'?'בוקר':'צהריים',t});localStorage.setItem('shiftHist',JSON.stringify(L.slice(0,14)))}catch(e){}histUI()}
 function histUI(){const L=histGet();$('hist2').innerHTML=L.length?`<details class="card hh"><summary>🗂️ סידורים קודמים (${L.length})</summary>${L.map((z,i)=>`<details><summary>${esc(z.d)} · ${esc(z.m)}</summary><pre>${esc(z.t)}</pre><a class="wa" target="_blank" rel="noopener" href="${waUrl(z.t)}">שלח בווצאפ</a></details>`).join('')}</details>`:''}
 load();chips();gatesUI();setLogo();histUI();['r4','r5','r6'].forEach(id=>{$(id).oninput=gatesUI});
-const VER='23.11.2026 · גרסה 65';$('ver').textContent='גרסה: '+VER+' · אם זה נראה לך לא מעודכן, פתח את הקישור עצמו (לא עותק שמור) ורענן את הדף';let wipeArm=false;$('wipe').onclick=()=>{if(!wipeArm){wipeArm=true;$('wipe').textContent='בטוח? לחץ שוב למחיקה';setTimeout(()=>{wipeArm=false;$('wipe').textContent='🗑️ מחק את כל הנתונים במכשיר הזה'},4000);return}try{localStorage.removeItem('shiftRoster');localStorage.removeItem('shift');localStorage.removeItem('shiftPal');localStorage.removeItem('shiftHist')}catch(e){}location.reload()};pre(new Date().getHours()>=13?'a':'m',true);restoreLast();setInterval(tick,30000);
+const VER='24.11.2026 · גרסה 66';$('ver').textContent='גרסה: '+VER+' · אם זה נראה לך לא מעודכן, פתח את הקישור עצמו (לא עותק שמור) ורענן את הדף';let wipeArm=false;$('wipe').onclick=()=>{if(!wipeArm){wipeArm=true;$('wipe').textContent='בטוח? לחץ שוב למחיקה';setTimeout(()=>{wipeArm=false;$('wipe').textContent='🗑️ מחק את כל הנתונים במכשיר הזה'},4000);return}try{localStorage.removeItem('shiftRoster');localStorage.removeItem('shift');localStorage.removeItem('shiftPal');localStorage.removeItem('shiftHist')}catch(e){}location.reload()};pre(new Date().getHours()>=13?'a':'m',true);restoreLast();setInterval(tick,30000);
 
 
 (function(){const sp=document.getElementById('splash');if(!sp)return;let seen=false;try{seen=!!sessionStorage.getItem('splashSeen')}catch(e){}
